@@ -1,12 +1,14 @@
 const Grid = document.getElementById("grid");
-const screen = document.getElementById("display");
+const topDisplay = document.getElementById("top-display");
+const bottomDisplay = document.getElementById("bottom-display");
 
 let button;
 let currentInput = "";
 let previousInput = "";
 let operator = "";
-let memory = null; // 💾 Memory variable
+let memory = null; 
 
+// text to be added to the buttons after their creation
 const buttonArray = [
     ["MC", "0", "1", "2", "+"],
     ["MS", "3", "4", "5", "-"],
@@ -15,7 +17,6 @@ const buttonArray = [
     ["1/x", ".", "x²", "√", "C"]
 ];
 
-// --- Create buttons dynamically ---
 for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
         const val = buttonArray[i][j];
@@ -23,7 +24,7 @@ for (let i = 0; i < 5; i++) {
         button.textContent = val;
         Grid.appendChild(button);
 
-        // --- Assign functionality ---
+        // Assigning functions
         if (isDigit(val) || val === ".") {
             button.addEventListener("click", () => appendValue(val));
         } else if (["+", "-", "x", "/"].includes(val)) {
@@ -50,15 +51,13 @@ for (let i = 0; i < 5; i++) {
     }
 }
 
-// --- Core Functions ---
-
 function isDigit(str) {
     return /^\d$/.test(str);
 }
 
 function appendValue(value) {
     currentInput += value;
-    updateScreen(currentInput);
+    updateBottom(currentInput);
 }
 
 function setOperator(op) {
@@ -67,6 +66,8 @@ function setOperator(op) {
     operator = op;
     previousInput = currentInput;
     currentInput = "";
+    updateTop(`${previousInput} ${operator}`);
+    updateBottom("");
 }
 
 function calculate() {
@@ -86,62 +87,67 @@ function calculate() {
     currentInput = result.toString();
     operator = "";
     previousInput = "";
-    updateScreen(currentInput);
+    updateTop("");
+    updateBottom(currentInput);
 }
 
 function clearScreen() {
     currentInput = "";
     previousInput = "";
     operator = "";
-    updateScreen("");
+    updateTop("");
+    updateBottom("");
 }
 
 function toggleSign() {
     if (currentInput === "") return;
     currentInput = (parseFloat(currentInput) * -1).toString();
-    updateScreen(currentInput);
+    updateBottom(currentInput);
 }
 
 function sqrt() {
     if (currentInput === "") return;
     let num = parseFloat(currentInput);
     currentInput = num >= 0 ? Math.sqrt(num).toString() : "Error";
-    updateScreen(currentInput);
+    updateBottom(currentInput);
 }
 
 function square() {
     if (currentInput === "") return;
     let num = parseFloat(currentInput);
     currentInput = (num * num).toString();
-    updateScreen(currentInput);
+    updateBottom(currentInput);
 }
 
 function reciprocal() {
     if (currentInput === "") return;
     let num = parseFloat(currentInput);
     currentInput = num !== 0 ? (1 / num).toString() : "Error";
-    updateScreen(currentInput);
+    updateBottom(currentInput);
 }
-
-// --- Memory Functions ---
 
 function memoryStore() {
     if (currentInput === "" || currentInput === "Error") return;
     memory = parseFloat(currentInput);
-    updateScreen("Stored: " + memory);
+    updateTop("Stored");
 }
 
 function memoryRecall() {
     if (memory === null) return;
     currentInput = memory.toString();
-    updateScreen(currentInput);
+    updateTop("Read");
+    updateBottom(currentInput);
 }
 
 function memoryClear() {
     memory = null;
-    updateScreen("Memory Cleared");
+    updateTop("Cleared");
 }
 
-function updateScreen(value) {
-    screen.textContent = value;
+function updateTop(value) {
+    topDisplay.textContent = value;
+}
+
+function updateBottom(value) {
+    bottomDisplay.textContent = value;
 }

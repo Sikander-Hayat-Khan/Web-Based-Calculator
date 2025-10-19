@@ -17,13 +17,26 @@ const buttonArray = [
     ["1/x", ".", "x²", "√", "C"]
 ];
 
+
+const yellowoperators = ["MC", "MS", "MR", "M+", "C", "/", "+", "-", "x"];
+const greyoperators = ["1/x", ".", "x²", "√", "±", "="];
 for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
         const val = buttonArray[i][j];
         button = document.createElement("button");
         button.textContent = val;
         Grid.appendChild(button);
+        button.style.color = "white"
 
+        if (yellowoperators.includes(val)) {
+            button.style.backgroundColor = "#FE9D0A";
+        }
+        else if (greyoperators.includes(val)) {
+            button.style.backgroundColor = "#9F9F9F";
+        }
+        else {
+            button.style.backgroundColor = "#313131"
+        }
         // Assigning functions
         if (isDigit(val) || val === ".") {
             button.addEventListener("click", () => appendValue(val));

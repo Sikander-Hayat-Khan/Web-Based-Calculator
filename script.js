@@ -2,7 +2,6 @@ const Grid = document.getElementById("grid");
 const topDisplay = document.getElementById("top-display");
 const bottomDisplay = document.getElementById("bottom-display");
 
-let button;
 let currentInput = "";
 let previousInput = "";
 let operator = "";
@@ -17,26 +16,32 @@ const buttonArray = [
     ["1/x", ".", "x²", "√", "C"]
 ];
 
+const accentOperators = ["MC", "MS", "MR", "M+", "C", "/", "+", "-", "x", "="];
+const secondaryOperators = ["1/x", ".", "x²", "√", "±"];
 
-const yellowoperators = ["MC", "MS", "MR", "M+", "C", "/", "+", "-", "x"];
-const greyoperators = ["1/x", ".", "x²", "√", "±", "="];
 for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
         const val = buttonArray[i][j];
-        button = document.createElement("button");
+        const button = document.createElement("button");
         button.textContent = val;
         Grid.appendChild(button);
-        button.style.color = "white"
 
-        if (yellowoperators.includes(val)) {
-            button.style.backgroundColor = "#FE9D0A";
+        if (accentOperators.includes(val)) {
+            button.classList.add("btn-accent");
+        } else if (secondaryOperators.includes(val)) {
+            button.classList.add("btn-secondary");
+        } else {
+            button.classList.add("btn-primary");
         }
-        else if (greyoperators.includes(val)) {
-            button.style.backgroundColor = "#9F9F9F";
-        }
-        else {
-            button.style.backgroundColor = "#313131"
-        }
+        
+        // Scale effect on click
+        button.addEventListener("click", () => {
+            button.classList.add("clicked");
+            setTimeout(() => {
+                button.classList.remove("clicked");
+            }, 150);
+        });
+
         // Assigning functions
         if (isDigit(val) || val === ".") {
             button.addEventListener("click", () => appendValue(val));
@@ -60,6 +65,8 @@ for (let i = 0; i < 5; i++) {
             button.addEventListener("click", memoryRecall);
         } else if (val === "MC") {
             button.addEventListener("click", memoryClear);
+        } else if (val === "M+") {
+            button.addEventListener("click", memoryAdd);
         }
     }
 }
@@ -109,7 +116,7 @@ function clearScreen() {
     previousInput = "";
     operator = "";
     updateTop("");
-    updateBottom("");
+    updateBottom("0");
 }
 
 function toggleSign() {
@@ -154,7 +161,18 @@ function memoryRecall() {
 
 function memoryClear() {
     memory = null;
-    updateTop("Cleared");
+    updateTop("");
+}
+
+function memoryAdd() {
+    if (memory === null || currentInput === "") return;
+    let num = parseFloat(currentInput);
+    if (!isNaN(num)) {
+        let newTotal = num + memory;
+        currentInput = newTotal.toString();
+        updateBottom(currentInput);
+        updateTop("Added from Memory");
+    }
 }
 
 function updateTop(value) {
@@ -162,5 +180,5 @@ function updateTop(value) {
 }
 
 function updateBottom(value) {
-    bottomDisplay.textContent = value;
+    bottomDisplay.textContent = value || "0";
 }
